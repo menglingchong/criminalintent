@@ -16,6 +16,12 @@ public class Crime {
 		mDate = new Date();
 	}
 
+	@Override
+	public String toString() {
+		// TODO Auto-generated method stub
+		return mTitle;
+	}
+
 	public String getTitle() {
 		return mTitle;
 	}
