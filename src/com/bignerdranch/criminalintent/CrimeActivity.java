@@ -1,31 +1,31 @@
 package com.bignerdranch.criminalintent;
 
-import android.app.Activity;
 import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentTransaction;
-import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
-public class CrimeActivity extends Activity {
+//CrimeActivity类继承抽象SingleFragmentActivity类,并实现父类的抽象方法
+public class CrimeActivity extends SingleFragmentActivity {
 
-	private Fragment fragment;
+	/*
+	 * private Fragment fragment;
+	 * @Override protected void onCreate(Bundle savedInstanceState) {
+	 * super.onCreate(savedInstanceState);
+	 * setContentView(R.layout.activity_fragment);
+	 * 
+	 * FragmentManager fragmentManager = getFragmentManager();
+	 * FragmentTransaction transaction = fragmentManager.beginTransaction();
+	 * //从fragmentManger中请求fragment，若列中有该fragment，则直接返回。 Fragment fragment =
+	 * fragmentManager .findFragmentById(R.id.fragmentCotainer); if (fragment ==
+	 * null) { fragment = new CrimeFragment();
+	 * transaction.add(R.id.fragmentCotainer, fragment); transaction.commit(); }
+	 * }
+	 */
+	
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_crime);
-
-		FragmentManager fragmentManager = getFragmentManager();
-		FragmentTransaction transaction = fragmentManager.beginTransaction();
-		//从fragmentManger中请求fragment，若列中有该fragment，则直接返回。
-		Fragment fragment = fragmentManager
-				.findFragmentById(R.id.fragmentCotainer);
-		if (fragment == null) {
-			fragment = new CrimeFragment();
-			transaction.add(R.id.fragmentCotainer, fragment);
-			transaction.commit();
-		}
+	protected Fragment createFragment() {
+		// TODO Auto-generated method stub
+		return new CrimeFragment();
 	}
 
 	@Override
@@ -46,4 +46,5 @@ public class CrimeActivity extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
+
 }
