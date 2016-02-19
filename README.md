@@ -6,4 +6,4 @@
   
     主要介绍 1.Fragment的使用，Fragment的生命周期，Fragment的管理器。
             2.布局与组件的详细使用介绍。
-            3.使用ListFragment显示列表。
+            3.使用ListFragment显示列表,使用单例来存储数据，单例可以保持数据一直存在，创建ListFragment并使用抽象的activity托管fragment，SingleFragmentActivity类为抽象activity类，可以简化代码的书写。
