@@ -8,3 +8,4 @@
             2.布局与组件的详细使用介绍。
             3.使用ListFragment显示列表,使用单例来存储数据，单例可以保持数据一直存在，创建ListFragment并使用抽象的activity托管fragment，SingleFragmentActivity类为抽象activity类，可以简化代码的书写。
             4.使用adapter从模型层获取数据，并将数据提供给ListView显示。创建ArrayAdapter类实例，响应列表项的点击事件。
+            5.定制列表项，创建定制列表项布局和列表项适配器。创建适配器，覆盖getView()方法，产生定制布局的视图对象，并填充对应的Crime数据
