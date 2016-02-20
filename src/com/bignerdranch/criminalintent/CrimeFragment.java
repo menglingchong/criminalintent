@@ -1,5 +1,7 @@
 package com.bignerdranch.criminalintent;
 
+import java.util.UUID;
+
 import android.app.Fragment;
 import android.os.Bundle;
 import android.text.Editable;
@@ -15,6 +17,7 @@ import android.widget.EditText;
 
 public class CrimeFragment extends Fragment {
 
+	public static final String EXTRA_CRIME_ID = "com.bignerdranch.criminalintent.crime_id";
 	private Crime mCrime;
 	private EditText mTitleField;
 	private Button mDateButton;
@@ -24,7 +27,10 @@ public class CrimeFragment extends Fragment {
 	// 配置Fragment实例
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		mCrime = new Crime();
+		// UUID crimeId = (UUID) getActivity().getIntent().getSerializableExtra(
+		// EXTRA_CRIME_ID);
+		UUID crimeId = (UUID) getArguments().getSerializable(EXTRA_CRIME_ID);// 获取fragment的argument
+		mCrime = CrimeLab.get(getActivity()).getCrime(crimeId);
 	}
 
 	@Override
@@ -33,6 +39,7 @@ public class CrimeFragment extends Fragment {
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_crime, container, false);
 		mTitleField = (EditText) view.findViewById(R.id.crime_title);
+		mTitleField.setText(mCrime.getTitle());
 		mTitleField.addTextChangedListener(new TextWatcher() {
 
 			@Override
@@ -60,6 +67,7 @@ public class CrimeFragment extends Fragment {
 		mDateButton.setEnabled(false);
 
 		mSolvedCheckBox = (CheckBox) view.findViewById(R.id.crime_solved);
+		mSolvedCheckBox.setChecked(mCrime.isSolved());
 		mSolvedCheckBox
 				.setOnCheckedChangeListener(new OnCheckedChangeListener() {
 
@@ -70,6 +78,17 @@ public class CrimeFragment extends Fragment {
 					}
 				});
 		return view;
+	}
+
+	// 将argument附加给fragment
+	public static CrimeFragment newInstance(UUID crimeId) {
+		// TODO Auto-generated method stub
+		Bundle args = new Bundle();// 创建bundle对象，并将argument放入bundle中
+		args.putSerializable(EXTRA_CRIME_ID, crimeId);
+
+		CrimeFragment fragment = new CrimeFragment();// fragment实例的创建，附加argument给fragment
+		fragment.setArguments(args);
+		return fragment;
 	}
 
 }

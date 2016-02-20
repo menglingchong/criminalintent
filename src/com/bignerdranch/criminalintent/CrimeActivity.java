@@ -1,5 +1,7 @@
 package com.bignerdranch.criminalintent;
 
+import java.util.UUID;
+
 import android.app.Fragment;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -9,6 +11,7 @@ public class CrimeActivity extends SingleFragmentActivity {
 
 	/*
 	 * private Fragment fragment;
+	 * 
 	 * @Override protected void onCreate(Bundle savedInstanceState) {
 	 * super.onCreate(savedInstanceState);
 	 * setContentView(R.layout.activity_fragment);
@@ -21,11 +24,14 @@ public class CrimeActivity extends SingleFragmentActivity {
 	 * transaction.add(R.id.fragmentCotainer, fragment); transaction.commit(); }
 	 * }
 	 */
-	
+
 	@Override
 	protected Fragment createFragment() {
 		// TODO Auto-generated method stub
-		return new CrimeFragment();
+		// return new CrimeFragment();
+		UUID crimeId = (UUID) getIntent().getSerializableExtra(
+				CrimeFragment.EXTRA_CRIME_ID);
+		return CrimeFragment.newInstance(crimeId);
 	}
 
 	@Override

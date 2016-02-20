@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import android.app.ListFragment;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -15,6 +16,7 @@ import android.widget.TextView;
 
 public class CrimeListFragment extends ListFragment {
 
+	private static final int REQUEST_CRIME = 1;
 	private static final String TAG = "CrimeListFragment";
 	private ArrayList<Crime> mCrimes;
 
@@ -32,12 +34,22 @@ public class CrimeListFragment extends ListFragment {
 	}
 
 	@Override
+	public void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
+		((CrimeAdapter) getListAdapter()).notifyDataSetChanged();
+	}
+
+	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
 		// TODO Auto-generated method stub
 		// Crime c = (Crime) (getListAdapter()).getItem(position);//
 		// getListAdapter()是一个ListFragment类的便利方法
 		Crime c = ((CrimeAdapter) getListAdapter()).getItem(position);
-		Log.d(TAG, c.getTitle() + " was clicked"); // 返回设置在ListFragment列表视图上的adapter。
+	    Log.d(TAG, c.getTitle() + " was clicked"); //返回设置在ListFragment列表视图上的adapter。
+		Intent i = new Intent(getActivity(), CrimeActivity.class);
+		i.putExtra(CrimeFragment.EXTRA_CRIME_ID, c.getId());
+		startActivity(i);
 	}
 
 	// 创建定制的adapter适配器
