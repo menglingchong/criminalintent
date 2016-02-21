@@ -2,7 +2,7 @@ package com.bignerdranch.criminalintent;
 
 import java.util.UUID;
 
-import android.app.Fragment;
+import android.support.v4.app.Fragment;
 import android.view.Menu;
 import android.view.MenuItem;
 

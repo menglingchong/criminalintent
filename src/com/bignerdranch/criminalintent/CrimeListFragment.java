@@ -2,7 +2,7 @@ package com.bignerdranch.criminalintent;
 
 import java.util.ArrayList;
 
-import android.app.ListFragment;
+import android.support.v4.app.ListFragment;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -46,10 +46,22 @@ public class CrimeListFragment extends ListFragment {
 		// Crime c = (Crime) (getListAdapter()).getItem(position);//
 		// getListAdapter()是一个ListFragment类的便利方法
 		Crime c = ((CrimeAdapter) getListAdapter()).getItem(position);
-	    Log.d(TAG, c.getTitle() + " was clicked"); //返回设置在ListFragment列表视图上的adapter。
-		Intent i = new Intent(getActivity(), CrimeActivity.class);
+		Log.d(TAG, c.getTitle() + " was clicked"); // 返回设置在ListFragment列表视图上的adapter。
+		// Intent i = new Intent(getActivity(), CrimeActivity.class);
+		Intent i = new Intent(getActivity(), CrimePagerActivity.class);
 		i.putExtra(CrimeFragment.EXTRA_CRIME_ID, c.getId());
-		startActivity(i);
+		// startActivity(i);
+		startActivityForResult(i, REQUEST_CRIME);
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		// TODO Auto-generated method stub
+		super.onActivityResult(requestCode, resultCode, data);
+		if (requestCode == REQUEST_CRIME) {
+			// Handle result,处理从activity传递给fragment的数据,即通过fragment获取返回的结果
+			// fragment能够从activity中接收返回结果
+		}
 	}
 
 	// 创建定制的adapter适配器

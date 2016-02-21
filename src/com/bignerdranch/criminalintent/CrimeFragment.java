@@ -2,7 +2,8 @@ package com.bignerdranch.criminalintent;
 
 import java.util.UUID;
 
-import android.app.Fragment;
+import android.app.Activity;
+import android.support.v4.app.Fragment;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
@@ -89,6 +90,11 @@ public class CrimeFragment extends Fragment {
 		CrimeFragment fragment = new CrimeFragment();// fragment实例的创建，附加argument给fragment
 		fragment.setArguments(args);
 		return fragment;
+	}
+
+	private void returnResult() {
+		// TODO Auto-generated method stub
+		getActivity().setResult(Activity.RESULT_OK, null);// 只有activity拥有返回结果
 	}
 
 }
