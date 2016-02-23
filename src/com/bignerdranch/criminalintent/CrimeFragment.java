@@ -1,13 +1,19 @@
 package com.bignerdranch.criminalintent;
 
+import java.util.Date;
 import java.util.UUID;
 
 import android.app.Activity;
+import android.content.Intent;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.NavUtils;
+import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -19,6 +25,8 @@ import android.widget.EditText;
 public class CrimeFragment extends Fragment {
 
 	public static final String EXTRA_CRIME_ID = "com.bignerdranch.criminalintent.crime_id";
+	private static final String DIALOG_DATE = "date";
+	private static final int REQUEST_DATE = 0;
 	private Crime mCrime;
 	private EditText mTitleField;
 	private Button mDateButton;
@@ -32,6 +40,12 @@ public class CrimeFragment extends Fragment {
 		// EXTRA_CRIME_ID);
 		UUID crimeId = (UUID) getArguments().getSerializable(EXTRA_CRIME_ID);// 获取fragment的argument
 		mCrime = CrimeLab.get(getActivity()).getCrime(crimeId);
+		setHasOptionsMenu(true);
+	}
+
+	// 更新日期
+	public void updateDate() {
+		mDateButton.setText(mCrime.getDate().toString());
 	}
 
 	@Override
@@ -39,6 +53,11 @@ public class CrimeFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		View view = inflater.inflate(R.layout.fragment_crime, container, false);
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			if (NavUtils.getParentActivityName(getActivity()) != null) {
+				getActivity().getActionBar().setDisplayHomeAsUpEnabled(true);
+			}
+		}
 		mTitleField = (EditText) view.findViewById(R.id.crime_title);
 		mTitleField.setText(mCrime.getTitle());
 		mTitleField.addTextChangedListener(new TextWatcher() {
@@ -64,8 +83,23 @@ public class CrimeFragment extends Fragment {
 		});
 
 		mDateButton = (Button) view.findViewById(R.id.crime_date);
-		mDateButton.setText(mCrime.getDate().toString());
-		mDateButton.setEnabled(false);
+		updateDate();
+		// mDateButton.setText(mCrime.getDate().toString());
+		// mDateButton.setEnabled(false);
+		mDateButton.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				FragmentManager fm = getActivity().getSupportFragmentManager();
+				// DatePickerFragment dialog = new DatePickerFragment();
+				// 替代fragment的构造方法，调用fragment的newInstance()方法
+				DatePickerFragment dialog = DatePickerFragment
+						.newInstance(mCrime.getDate());
+				dialog.setTargetFragment(CrimeFragment.this, REQUEST_DATE);// 设置目标fragment为CrimeFragment
+				dialog.show(fm, DIALOG_DATE);
+			}
+		});
 
 		mSolvedCheckBox = (CheckBox) view.findViewById(R.id.crime_solved);
 		mSolvedCheckBox.setChecked(mCrime.isSolved());
@@ -95,6 +129,36 @@ public class CrimeFragment extends Fragment {
 	private void returnResult() {
 		// TODO Auto-generated method stub
 		getActivity().setResult(Activity.RESULT_OK, null);// 只有activity拥有返回结果
+	}
+
+	@Override
+	public void onActivityResult(int requestCode, int resultCode, Intent data) {
+		// TODO Auto-generated method stub
+		if (resultCode != Activity.RESULT_OK)
+			return;
+		if (requestCode == REQUEST_DATE) {
+			Date date = (Date) data
+					.getSerializableExtra(DatePickerFragment.EXTRA_DATE);// 获取DatePickerFragment的附加到intent上的extra数据
+			mCrime.setDate(date);// 利用从fragment回传的数据更新模型层
+			// mDateButton.setText(mCrime.getDate().toString());
+			updateDate();
+		}
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		// TODO Auto-generated method stub
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			// 实现向上导航,回退到crime列表界面
+			if (NavUtils.getParentActivityName(getActivity()) != null) {
+				NavUtils.navigateUpFromSameTask(getActivity());// 导航至父activity界面
+			}
+			return true;
+
+		default:
+			return super.onOptionsItemSelected(item);
+		}
 	}
 
 }
