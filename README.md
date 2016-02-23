@@ -11,4 +11,7 @@
             5.定制列表项，创建定制列表项布局和列表项适配器。创建适配器，覆盖getView()方法，产生定制布局的视图对象，并填充对应的Crime数据
             6.使用fragment argument，从framgent中启动另一个activity，为了获取extra信息，可以简单直接的当式和复杂灵活的方式，简单直接的方式是一牺牲fragment的封装性为代价的，不利于扩展；复杂灵活的方式就是将extra信息保存到fragment的arugment bundle中。使用fragment argument只要是，附加argument给fragment和获取fragment的argument。
             7.使用 ViewPager,创建CrimePagerActivity，实现了详细Crimefragment的左右滑动显示,使用Viewpager并用到其适配器PagerAdapter，即FragmentStatePagerAdapter适配器，主要作用是将返回的fragment添加给托管的activity，并帮助Viewpager找到fragment的视图并一一对应。
+            8.创建对话框，将AlertDialog视图封装在DialogFragment中，并且实现在同一个activity中的fragment之间的数据传递。(比较重要！)
+            9.操作栏的使用，在操作栏上实现选线菜单和层级式导航(层级菜单)，实现层级式导航使用到NavUtils类，并在mainfest配置文件中配置activity的父activity。通过可选菜单项实现显示或者隐藏操作栏的子标题，并确保子标题在设备旋转后依然能够显示。
+            
    
