@@ -161,4 +161,11 @@ public class CrimeFragment extends Fragment {
 		}
 	}
 
+	@Override
+	public void onPause() {
+		// TODO Auto-generated method stub
+		super.onPause();
+		CrimeLab.get(getActivity()).saveCrimes();// 调用saveCriems()方法保存crime数据
+	}
+
 }

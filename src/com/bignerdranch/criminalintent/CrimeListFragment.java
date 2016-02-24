@@ -38,7 +38,7 @@ public class CrimeListFragment extends ListFragment {
 		// android.R.layout.simple_list_item_1, mCrimes);
 		CrimeAdapter adapter = new CrimeAdapter(mCrimes);
 		setListAdapter(adapter);// setListAdapter()是一个ListFragment类的便利方法。可为内置ListView设置adapter
-		setRetainInstance(true);
+		setRetainInstance(true);// 保存CrimeListFragment的状态信息,当activity销毁时可以保证fragment的状态不变
 		mSubtitleVisible = false;
 	}
 
