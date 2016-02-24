@@ -13,5 +13,6 @@
             7.使用 ViewPager,创建CrimePagerActivity，实现了详细Crimefragment的左右滑动显示,使用Viewpager并用到其适配器PagerAdapter，即FragmentStatePagerAdapter适配器，主要作用是将返回的fragment添加给托管的activity，并帮助Viewpager找到fragment的视图并一一对应。
             8.创建对话框，将AlertDialog视图封装在DialogFragment中，并且实现在同一个activity中的fragment之间的数据传递。(比较重要！)
             9.操作栏的使用，在操作栏上实现选线菜单和层级式导航(层级菜单)，实现层级式导航使用到NavUtils类，并在mainfest配置文件中配置activity的父activity。通过可选菜单项实现显示或者隐藏操作栏的子标题，并确保子标题在设备旋转后依然能够显示。
+            10.存储与加载本地文件，将crime数据转换成JSON格式的数据，即crime对象转换成json对象的序列化，并将其保存到本地文件中。从本地文件中读取crime数据，先从json文件中读取json格式的数据，并先将数据解析为JSONObject类型的string，然后解析为JSONArray，最后解析为crime对象。在模型层，先加载本地的crime数据，若没有则创建空的crime数组列表。
             
    
