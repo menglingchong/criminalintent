@@ -8,12 +8,17 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.ActionMode;
+import android.view.ContextMenu;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ContextMenu.ContextMenuInfo;
+import android.widget.AbsListView.MultiChoiceModeListener;
+import android.widget.AdapterView.AdapterContextMenuInfo;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.ListView;
@@ -52,6 +57,67 @@ public class CrimeListFragment extends ListFragment {
 			if (mSubtitleVisible) {
 				getActivity().getActionBar().setSubtitle(R.string.subtitle);
 			}
+		}
+
+		ListView listView = (ListView) v.findViewById(android.R.id.list);
+		if (Build.VERSION.SDK_INT < Build.VERSION_CODES.HONEYCOMB) {
+			registerForContextMenu(listView);// 为上下文菜单登记listView视图
+		} else {
+			listView.setChoiceMode(listView.CHOICE_MODE_MULTIPLE_MODAL);// 设置列表视图的选择模式
+			listView.setMultiChoiceModeListener(new MultiChoiceModeListener() {
+
+				@Override
+				// 视图在选中或撤销时调用该方法
+				public void onItemCheckedStateChanged(ActionMode mode,
+						int position, long id, boolean checked) {
+					// TODO Auto-generated method stub
+
+				}
+
+				@Override
+				// MultiChoiceModeListener实现了另一个接口，即ActionMode.Callback
+				// 用户屏幕进入上下文操作模式时，会创建一个ActionMode类的实例
+				public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+					// TODO Auto-generated method stub
+					MenuInflater inflater = mode.getMenuInflater();// 从操作模式获得MenuInflater，操作模式负责上下文操作栏进行配置
+					inflater.inflate(R.menu.crime_list_item_context, menu);
+					return true;
+				}
+
+				@Override
+				public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+					// TODO Auto-generated method stub
+					return false;
+				}
+
+				@Override
+				public boolean onActionItemClicked(ActionMode mode,
+						MenuItem item) {
+					// TODO Auto-generated method stub
+					switch (item.getItemId()) {
+					case R.id.menu_item_delete_crime:
+						CrimeAdapter adapter = (CrimeAdapter) getListAdapter();
+						CrimeLab crimeLab = CrimeLab.get(getActivity());
+						for (int i = adapter.getCount() - 1; i >= 0; i--) {
+							if (getListView().isItemChecked(i)) {
+								crimeLab.deleteCrime(adapter.getItem(i));
+							}
+						}
+						mode.finish();// 销毁操作模式
+						adapter.notifyDataSetChanged();
+						return true;
+
+					default:
+						return false;
+					}
+				}
+
+				@Override
+				public void onDestroyActionMode(ActionMode mode) {
+					// TODO Auto-generated method stub
+
+				}
+			});
 		}
 		return v;
 	}
@@ -154,5 +220,34 @@ public class CrimeListFragment extends ListFragment {
 			return super.onOptionsItemSelected(item);
 		}
 
+	}
+
+	// 创建上下文菜单
+	@Override
+	public void onCreateContextMenu(ContextMenu menu, View v,
+			ContextMenuInfo menuInfo) {
+		// TODO Auto-generated method stub
+		super.onCreateContextMenu(menu, v, menuInfo);
+		getActivity().getMenuInflater().inflate(R.menu.crime_list_item_context,
+				menu);
+	}
+
+	@Override
+	public boolean onContextItemSelected(MenuItem item) {
+		// TODO Auto-generated method stub
+		AdapterContextMenuInfo info = (AdapterContextMenuInfo) item
+				.getMenuInfo();
+		int position = info.position;// 获取选中列表在数据集中的位置信息
+		// 通过获取适配器来获得选中位置的crime信息
+		CrimeAdapter adapter = (CrimeAdapter) getListAdapter();
+		Crime crime = adapter.getItem(position);
+
+		switch (item.getItemId()) {
+		case R.id.menu_item_delete_crime:
+			CrimeLab.get(getActivity()).deleteCrime(crime);
+			adapter.notifyDataSetChanged();
+			return true;
+		}
+		return super.onContextItemSelected(item);
 	}
 }

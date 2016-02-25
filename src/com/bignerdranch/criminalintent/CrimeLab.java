@@ -64,6 +64,11 @@ public class CrimeLab {
 		mCrimes.add(c);
 	}
 
+	// 删除Crime
+	public void deleteCrime(Crime c) {
+		mCrimes.remove(c);
+	}
+
 	// 将crime列表中的数据转换为JSON格式的数据，并保存到文件中
 	public boolean saveCrimes() {
 		try {
