@@ -6,15 +6,19 @@ import java.util.UUID;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Camera;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.NavUtils;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.ContactsContract;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.text.format.DateFormat;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -35,12 +39,14 @@ public class CrimeFragment extends Fragment {
 	private static final String DIALOG_DATE = "date";
 	private static final int REQUEST_DATE = 0;
 	private static final int REQUEST_PHOTO = 1;
+	private static final int REQUEST_CONTACT = 2;
 	private Crime mCrime;
 	private EditText mTitleField;
 	private Button mDateButton;
 	private CheckBox mSolvedCheckBox;
 	private ImageButton mPhotoButton;
 	private ImageView mPhotoView;
+	private Button mSuspectButton;
 	private static final String DIALOG_IMAGE = "image";
 
 	@Override
@@ -163,6 +169,40 @@ public class CrimeFragment extends Fragment {
 		if (!hasACamera) {
 			mPhotoButton.setEnabled(false);
 		}
+
+		Button reportButton = (Button) view
+				.findViewById(R.id.crime_reportButton);
+		reportButton.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Intent i = new Intent(Intent.ACTION_SEND);
+				i.setType("text/plain");
+				i.putExtra(Intent.EXTRA_TEXT, getCrimeReport());
+				i.putExtra(Intent.EXTRA_SUBJECT,
+						getString(R.string.crime_report_subject));
+				i = Intent.createChooser(i, getString(R.string.send_report));// 创建一个每次都显示的activity的选择器
+				startActivity(i);
+			}
+		});
+
+		mSuspectButton = (Button) view.findViewById(R.id.crime_suspectButton);
+		mSuspectButton.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				// 隐式intent由操作以及数据获取位置组成
+				Intent i = new Intent(Intent.ACTION_PICK,
+						ContactsContract.Contacts.CONTENT_URI);
+				startActivityForResult(i, REQUEST_CONTACT);
+			}
+		});
+
+		if (mCrime.getSuspect() != null) {
+			mSuspectButton.setText(mCrime.getSuspect());
+		}
 		return view;
 	}
 
@@ -230,7 +270,25 @@ public class CrimeFragment extends Fragment {
 				Log.i(TAG, "Crime: " + mCrime.getTitle() + " has a photo");
 				showPhoto();
 			}
+		} else if (requestCode == REQUEST_CONTACT) {
+			Uri contactUri = data.getData();
+
+			String[] queryFields = new String[] { ContactsContract.Contacts.DISPLAY_NAME };
+
+			Cursor c = getActivity().getContentResolver().query(contactUri,
+					queryFields, null, null, null);
+
+			if (c.getCount() == 0) {
+				c.close();
+				return;
+			}
+			c.moveToFirst();
+			String suspect = c.getString(0);
+			mCrime.setSuspect(suspect);
+			mSuspectButton.setText(suspect);
+			c.close();
 		}
+
 	}
 
 	@Override
@@ -254,6 +312,32 @@ public class CrimeFragment extends Fragment {
 		// TODO Auto-generated method stub
 		super.onPause();
 		CrimeLab.get(getActivity()).saveCrimes();// 调用saveCriems()方法保存crime数据
+	}
+
+	// 创建格式化字符串
+	private String getCrimeReport() {
+		String solvedString = null;
+		if (mCrime.isSolved()) {
+			solvedString = getString(R.string.crime_report_solved);
+		} else {
+			solvedString = getString(R.string.crime_report_unsolved);
+		}
+
+		String dateFormate = "EEE,MMM dd";
+		String dateString = DateFormat.format(dateFormate, mCrime.getDate())
+				.toString();
+
+		String suspect = mCrime.getSuspect();
+		if (suspect == null) {
+			suspect = getString(R.string.crime_report_no_suspect);
+		} else {
+			suspect = getString(R.string.crime_report_suspect, suspect);
+		}
+
+		String report = getString(R.string.crime_report, mCrime.getTitle(),
+				dateString, solvedString, suspect);
+		return null;
+
 	}
 
 }
