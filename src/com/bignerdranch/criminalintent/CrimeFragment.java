@@ -5,6 +5,9 @@ import java.util.UUID;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.drawable.BitmapDrawable;
+import android.hardware.Camera;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.NavUtils;
@@ -12,6 +15,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -21,16 +25,23 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.CompoundButton.OnCheckedChangeListener;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 
 public class CrimeFragment extends Fragment {
 
+	private static final String TAG = "CrimeFragment";
 	public static final String EXTRA_CRIME_ID = "com.bignerdranch.criminalintent.crime_id";
 	private static final String DIALOG_DATE = "date";
 	private static final int REQUEST_DATE = 0;
+	private static final int REQUEST_PHOTO = 1;
 	private Crime mCrime;
 	private EditText mTitleField;
 	private Button mDateButton;
 	private CheckBox mSolvedCheckBox;
+	private ImageButton mPhotoButton;
+	private ImageView mPhotoView;
+	private static final String DIALOG_IMAGE = "image";
 
 	@Override
 	// 配置Fragment实例
@@ -112,7 +123,73 @@ public class CrimeFragment extends Fragment {
 						mCrime.setSolved(isChecked);
 					}
 				});
+
+		mPhotoButton = (ImageButton) view.findViewById(R.id.crime_imageButton);
+		mPhotoButton.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Intent i = new Intent(getActivity(), CrimeCameraActivity.class);
+				// startActivity(i);
+				startActivityForResult(i, REQUEST_PHOTO);
+			}
+		});
+
+		mPhotoView = (ImageView) view.findViewById(R.id.crime_imageView);
+		mPhotoView.setOnClickListener(new View.OnClickListener() {
+
+			@Override
+			public void onClick(View v) {
+				// TODO Auto-generated method stub
+				Photo p = mCrime.getPhoto();
+				if (p == null) {
+					return;
+				}
+
+				FragmentManager fm = getActivity().getSupportFragmentManager();
+				String path = getActivity().getFileStreamPath(p.getFilename())
+						.getAbsolutePath();
+				ImageFragment.newInstance(path).show(fm, DIALOG_IMAGE);
+			}
+		});
+
+		// 查询PackageManager确认设备是否带有相机
+		PackageManager pm = getActivity().getPackageManager();
+		boolean hasACamera = pm.hasSystemFeature(PackageManager.FEATURE_CAMERA)
+				|| pm.hasSystemFeature(PackageManager.FEATURE_CAMERA_FRONT)
+				|| Build.VERSION.SDK_INT < Build.VERSION_CODES.GINGERBREAD
+				|| Camera.getNumberOfCameras() > 0;
+		if (!hasACamera) {
+			mPhotoButton.setEnabled(false);
+		}
 		return view;
+	}
+
+	// 将缩放后的图片设置给ImageView视图
+	private void showPhoto() {
+		Photo p = mCrime.getPhoto();
+		BitmapDrawable b = null;
+		if (p != null) {
+			String path = getActivity().getFileStreamPath(p.getFilename())
+					.getAbsolutePath();
+			b = PictureUtils.getScaledDrawable(getActivity(), path);
+		}
+		mPhotoView.setImageDrawable(b);
+	}
+
+	@Override
+	public void onStart() {
+		// TODO Auto-generated method stub
+		super.onStart();
+		showPhoto();// 加载图片
+	}
+
+	@Override
+	public void onStop() {
+		// TODO Auto-generated method stub
+		super.onStop();
+		PictureUtils.cleanImageView(mPhotoView);// 卸载图片
 	}
 
 	// 将argument附加给fragment
@@ -142,6 +219,17 @@ public class CrimeFragment extends Fragment {
 			mCrime.setDate(date);// 利用从fragment回传的数据更新模型层
 			// mDateButton.setText(mCrime.getDate().toString());
 			updateDate();
+		} else if (requestCode == REQUEST_PHOTO) {
+			String filename = data
+					.getStringExtra(CrimeCameraFragment.EXTRA_PHOTO_FILENAME);
+			if (filename != null) {
+				// Log.i(TAG, "filename:" + filename);// 输出照片文件名
+
+				Photo p = new Photo(filename);
+				mCrime.setPhoto(p);
+				Log.i(TAG, "Crime: " + mCrime.getTitle() + " has a photo");
+				showPhoto();
+			}
 		}
 	}
 
